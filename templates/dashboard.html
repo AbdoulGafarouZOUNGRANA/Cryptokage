@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CryptoApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --accent: #7c3aed;
+            --bg-dark: #0a0e1a;
+            --bg-card: #0f1629;
+            --bg-input: #1a2240;
+            --border: rgba(0, 212, 255, 0.15);
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: rgba(12, 17, 32, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar-user {
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.05);
+            margin: 16px;
+            border-radius: 12px;
+        }
+        .sidebar-nav {
+            padding: 16px;
+        }
+        .nav-section {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 12px 16px 6px;
+        }
+        .nav-item {
+            margin: 4px 0;
+        }
+        .nav-btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        .nav-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
+            color: var(--primary);
+        }
+        .sub-menu {
+            padding-left: 44px;
+            display: none;
+        }
+        .sub-menu.open { display: block; }
+        .sub-btn {
+            width: 100%;
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .sub-btn:hover {
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--text);
+        }
+        /* Main content */
+        .main-content {
+            margin-left: 280px;
+            padding: 24px;
+        }
+        /* Cards */
+        .crypto-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .badge-algo {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-sym { background: rgba(0, 212, 255, 0.15); color: var(--primary); }
+        .badge-asym { background: rgba(124, 58, 237, 0.15); color: #a78bfa; }
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-control, textarea, select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        .form-control:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #0099cc);
+            color: #0a0e1a;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3); }
+        .btn-secondary {
+            background: rgba(124, 58, 237, 0.8);
+            color: white;
+        }
+        .btn-secondary:hover { background: rgba(124, 58, 237, 1); }
+        .result-box {
+            background: var(--bg-input);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            min-height: 100px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        .logout-btn {
+            margin: 16px;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            color: #f87171;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-weight: 500;
+        }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.25); }
+        .key-box {
+            background: rgba(124, 58, 237, 0.08);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h2>🔐 CryptoApp</h2>
+        <p style="font-size: 11px; color: #475569;">Pr. Asmae EL KASSIRI</p>
+    </div>
+    <div class="sidebar-user">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700;">{{ username[0].upper() }}</div>
+            <div>
+                <div style="font-weight: 600;">{{ username }}</div>
+                <div style="font-size: 11px; color: var(--primary);">{{ 'Administrateur' if role == 'admin' else 'Utilisateur' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="nav-section">Cryptographie Symétrique</div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('cesar')"><i class="bi bi-arrow-repeat"></i> Code César</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('vigenere')"><i class="bi bi-key"></i> Vigenère</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('vernam')"><i class="bi bi-shield-lock"></i> Vernam (OTP)</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('rc4')"><i class="bi bi-activity"></i> RC4</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="toggleMenu('des-menu')"><i class="bi bi-layers"></i> DES & Modes <i class="bi bi-chevron-down" id="des-arrow"></i></button></div>
+        <div class="sub-menu" id="des-menu">
+            <button class="sub-btn" onclick="showPage('des')">DES (ECB)</button>
+            <button class="sub-btn" onclick="showPage('cbc')">DES-CBC</button>
+            <button class="sub-btn" onclick="showPage('cfb')">DES-CFB</button>
+        </div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('aes')"><i class="bi bi-cpu"></i> AES-128</button></div>
+
+        <div class="nav-section mt-3">Cryptographie Asymétrique</div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('rsa')"><i class="bi bi-lock-fill"></i> RSA</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('elgamal')"><i class="bi bi-diagram-3"></i> ElGamal</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="showPage('ec_elgamal')"><i class="bi bi-bezier2"></i> EC-ElGamal</button></div>
+    </div>
+
+    {% if role == 'admin' %}
+    <a href="/admin" class="logout-btn" style="background: rgba(0, 212, 255, 0.1); color: var(--primary); margin-top: auto;">
+        <i class="bi bi-people"></i> Administration
+    </a>
+    {% endif %}
+    <a href="/logout" class="logout-btn"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Page César -->
+    <div class="page" id="page-cesar">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-arrow-repeat me-2"></i>Code César</div>
+                <span class="badge-algo badge-sym">Symétrique - Décalage alphabétique</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="cesar-msg" class="form-control" placeholder="Entrez votre message..."></textarea></div>
+                    <div class="form-group"><label>Décalage (1-25)</label><input type="number" id="cesar-key" class="form-control" value="3" min="1" max="25"></div>
+                    <button class="btn btn-primary" onclick="cryptoRequest('cesar', 'chiffrer', 'cesar-msg', 'cesar-key')"><i class="bi bi-lock"></i> Chiffrer</button>
+                    <button class="btn btn-secondary ms-2" onclick="cryptoRequest('cesar', 'dechiffrer', 'cesar-msg', 'cesar-key')"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Résultat</label><div id="result-cesar" class="result-box">Le résultat apparaîtra ici...</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Vigenère -->
+    <div class="page" id="page-vigenere">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-key me-2"></i>Vigenère</div>
+                <span class="badge-algo badge-sym">Symétrique - Substitution polyalphabétique</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="vigenere-msg" class="form-control" placeholder="Entrez votre message..."></textarea></div>
+                    <div class="form-group"><label>Clé (lettres uniquement)</label><input type="text" id="vigenere-key" class="form-control" value="CLE"></div>
+                    <button class="btn btn-primary" onclick="cryptoRequest('vigenere', 'chiffrer', 'vigenere-msg', 'vigenere-key')"><i class="bi bi-lock"></i> Chiffrer</button>
+                    <button class="btn btn-secondary ms-2" onclick="cryptoRequest('vigenere', 'dechiffrer', 'vigenere-msg', 'vigenere-key')"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Résultat</label><div id="result-vigenere" class="result-box">Le résultat apparaîtra ici...</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Vernam -->
+    <div class="page" id="page-vernam">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-shield-lock me-2"></i>Vernam (One-Time Pad)</div>
+                <span class="badge-algo badge-sym">Sécurité parfaite - XOR</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="vernam-msg" class="form-control" placeholder="Message secret..."></textarea></div>
+                    <div class="form-group"><label>Clé (optionnelle)</label><input type="text" id="vernam-key" class="form-control" placeholder="Laissez vide pour clé aléatoire"></div>
+                    <button class="btn btn-primary" onclick="vernamChiffrer()"><i class="bi bi-lock"></i> Chiffrer</button>
+                </div>
+                <div><label>Résultat (hex)</label><div id="result-vernam" class="result-box">-</div><label class="mt-2">Clé (hex) à conserver</label><div id="vernam-key-hex" class="result-box">-</div></div>
+            </div>
+            <hr class="my-3">
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Texte chiffré (hex)</label><textarea id="vernam-cipher" class="form-control" placeholder="Hexadécimal..."></textarea></div>
+                    <div class="form-group"><label>Clé (hex)</label><input type="text" id="vernam-dec-key" class="form-control"></div>
+                    <button class="btn btn-secondary" onclick="vernamDechiffrer()"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Message déchiffré</label><div id="result-vernam-dec" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page RC4 -->
+    <div class="page" id="page-rc4">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-activity me-2"></i>RC4</div>
+                <span class="badge-algo badge-sym">Chiffrement par flot</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="rc4-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>Clé</label><input type="text" id="rc4-key" class="form-control" value="secret"></div>
+                    <button class="btn btn-primary" onclick="cryptoRequest('rc4', 'chiffrer', 'rc4-msg', 'rc4-key')"><i class="bi bi-lock"></i> Chiffrer</button>
+                    <button class="btn btn-secondary ms-2" onclick="cryptoRequest('rc4', 'dechiffrer', 'rc4-msg', 'rc4-key')"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Résultat (hex)</label><div id="result-rc4" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page DES -->
+    <div class="page" id="page-des">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-layers me-2"></i>DES (ECB)</div>
+                <span class="badge-algo badge-sym">Réseau de Feistel - 16 rondes</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="des-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>Clé (8 caractères)</label><input type="text" id="des-key" class="form-control" value="DESkey1!"></div>
+                    <button class="btn btn-primary" onclick="cryptoRequest('des', 'chiffrer', 'des-msg', 'des-key')"><i class="bi bi-lock"></i> Chiffrer</button>
+                    <button class="btn btn-secondary ms-2" onclick="cryptoRequest('des', 'dechiffrer', 'des-msg', 'des-key')"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Résultat (hex)</label><div id="result-des" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page CBC -->
+    <div class="page" id="page-cbc">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-link-45deg me-2"></i>DES-CBC</div>
+                <span class="badge-algo badge-sym">Cipher Block Chaining</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="cbc-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>Clé (8 caractères)</label><input type="text" id="cbc-key" class="form-control" value="DESkey1!"></div>
+                    <button class="btn btn-primary" onclick="cbcChiffrer()"><i class="bi bi-lock"></i> Chiffrer (IV auto)</button>
+                </div>
+                <div><label>Résultat (hex)</label><div id="result-cbc" class="result-box">-</div><label class="mt-2">IV</label><div id="cbc-iv" class="result-box">-</div></div>
+            </div>
+            <hr>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Texte chiffré (hex)</label><textarea id="cbc-dec-msg" class="form-control"></textarea></div>
+                    <div class="form-group"><label>IV (hex)</label><input type="text" id="cbc-dec-iv" class="form-control"></div>
+                    <button class="btn btn-secondary" onclick="cbcDechiffrer()"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Message déchiffré</label><div id="result-cbc-dec" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page CFB -->
+    <div class="page" id="page-cfb">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-water me-2"></i>DES-CFB</div>
+                <span class="badge-algo badge-sym">Cipher Feedback - Mode flot</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="cfb-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>Clé (8 caractères)</label><input type="text" id="cfb-key" class="form-control" value="DESkey1!"></div>
+                    <button class="btn btn-primary" onclick="cfbChiffrer()"><i class="bi bi-lock"></i> Chiffrer (IV auto)</button>
+                </div>
+                <div><label>Résultat (hex)</label><div id="result-cfb" class="result-box">-</div><label class="mt-2">IV</label><div id="cfb-iv" class="result-box">-</div></div>
+            </div>
+            <hr>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Texte chiffré (hex)</label><textarea id="cfb-dec-msg" class="form-control"></textarea></div>
+                    <div class="form-group"><label>IV (hex)</label><input type="text" id="cfb-dec-iv" class="form-control"></div>
+                    <button class="btn btn-secondary" onclick="cfbDechiffrer()"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Message déchiffré</label><div id="result-cfb-dec" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page AES -->
+    <div class="page" id="page-aes">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-cpu me-2"></i>AES-128</div>
+                <span class="badge-algo badge-sym">Standard NIST - 10 rondes</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="aes-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>Clé (16 caractères)</label><input type="text" id="aes-key" class="form-control" value="AESkey_16bytes!"></div>
+                    <button class="btn btn-primary" onclick="cryptoRequest('aes', 'chiffrer', 'aes-msg', 'aes-key')"><i class="bi bi-lock"></i> Chiffrer</button>
+                    <button class="btn btn-secondary ms-2" onclick="cryptoRequest('aes', 'dechiffrer', 'aes-msg', 'aes-key')"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Résultat (hex)</label><div id="result-aes" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page RSA -->
+    <div class="page" id="page-rsa">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-lock-fill me-2"></i>RSA</div>
+                <span class="badge-algo badge-asym">Asymétrique - Factorisation</span>
+            </div>
+            <button class="btn btn-primary mb-3" onclick="genererClesRSA()"><i class="bi bi-key"></i> Générer les clés RSA</button>
+            <div id="rsa-keys" class="key-box" style="display:none;">
+                <div><strong>Clé publique (e, n):</strong> e=<span id="rsa-e"></span>, n=<span id="rsa-n"></span></div>
+                <div class="mt-2"><strong>Clé privée (d, n):</strong> d=<span id="rsa-d"></span></div>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="rsa-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>e (public)</label><input type="text" id="rsa-e-input" class="form-control"></div>
+                    <div class="form-group"><label>n (module)</label><input type="text" id="rsa-n-input" class="form-control"></div>
+                    <button class="btn btn-primary" onclick="rsaChiffrer()"><i class="bi bi-lock"></i> Chiffrer</button>
+                </div>
+                <div><label>Résultat chiffré</label><div id="result-rsa" class="result-box">-</div></div>
+            </div>
+            <hr>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>d (privé)</label><input type="text" id="rsa-d-input" class="form-control"></div>
+                    <div class="form-group"><label>n (module)</label><input type="text" id="rsa-n-dec-input" class="form-control"></div>
+                    <button class="btn btn-secondary" onclick="rsaDechiffrer()"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Message déchiffré</label><div id="result-rsa-dec" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page ElGamal -->
+    <div class="page" id="page-elgamal">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-diagram-3 me-2"></i>ElGamal</div>
+                <span class="badge-algo badge-asym">Asymétrique - Logarithme discret</span>
+            </div>
+            <button class="btn btn-primary mb-3" onclick="genererClesElGamal()"><i class="bi bi-key"></i> Générer les clés ElGamal</button>
+            <div id="elgamal-keys" class="key-box" style="display:none;">
+                <div><strong>Clé publique:</strong> p=<span id="elg-p"></span>, g=<span id="elg-g"></span>, y=<span id="elg-y"></span></div>
+                <div class="mt-2"><strong>Clé privée:</strong> x=<span id="elg-x"></span></div>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="elg-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>p</label><input type="text" id="elg-p-input" class="form-control"></div>
+                    <div class="form-group"><label>g</label><input type="text" id="elg-g-input" class="form-control"></div>
+                    <div class="form-group"><label>y</label><input type="text" id="elg-y-input" class="form-control"></div>
+                    <button class="btn btn-primary" onclick="elgamalChiffrer()"><i class="bi bi-lock"></i> Chiffrer</button>
+                </div>
+                <div><label>Résultat (a:b,...)</label><div id="result-elg" class="result-box">-</div></div>
+            </div>
+            <hr>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>x (privé)</label><input type="text" id="elg-x-input" class="form-control"></div>
+                    <div class="form-group"><label>p</label><input type="text" id="elg-p-dec-input" class="form-control"></div>
+                    <button class="btn btn-secondary" onclick="elgamalDechiffrer()"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Message déchiffré</label><div id="result-elg-dec" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page EC-ElGamal -->
+    <div class="page" id="page-ec_elgamal">
+        <div class="crypto-card">
+            <div class="card-header">
+                <div class="card-title"><i class="bi bi-bezier2 me-2"></i>EC-ElGamal (secp256k1)</div>
+                <span class="badge-algo badge-asym">Courbe elliptique</span>
+            </div>
+            <button class="btn btn-primary mb-3" onclick="genererClesECElGamal()"><i class="bi bi-key"></i> Générer les clés EC-ElGamal</button>
+            <div id="ec-keys" class="key-box" style="display:none;">
+                <div><strong>Clé publique Q:</strong> (<span id="ec-qx"></span>, <span id="ec-qy"></span>)</div>
+                <div class="mt-2"><strong>Clé privée k:</strong> <span id="ec-k"></span></div>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>Message</label><textarea id="ec-msg" class="form-control" placeholder="Message..."></textarea></div>
+                    <div class="form-group"><label>Qx</label><input type="text" id="ec-qx-input" class="form-control"></div>
+                    <div class="form-group"><label>Qy</label><input type="text" id="ec-qy-input" class="form-control"></div>
+                    <button class="btn btn-primary" onclick="ecElgamalChiffrer()"><i class="bi bi-lock"></i> Chiffrer</button>
+                </div>
+                <div><label>Résultat (points)</label><div id="result-ec" class="result-box">-</div></div>
+            </div>
+            <hr>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>k (privé)</label><input type="text" id="ec-k-input" class="form-control"></div>
+                    <button class="btn btn-secondary" onclick="ecElgamalDechiffrer()"><i class="bi bi-unlock"></i> Déchiffrer</button>
+                </div>
+                <div><label>Message déchiffré</label><div id="result-ec-dec" class="result-box">-</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let rsaKeys = {}, elgKeys = {}, ecKeys = {};
+
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${pageId}`).classList.add('active');
+}
+
+function toggleMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    menu.classList.toggle('open');
+}
+
+async function cryptoRequest(algo, operation, msgId, keyId) {
+    const message = document.getElementById(msgId).value;
+    let params = {};
+    if (keyId) {
+        const keyValue = document.getElementById(keyId).value;
+        params = { cle: keyValue };
+    }
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: algo, operation, message, params })
+        });
+        const data = await response.json();
+        document.getElementById(`result-${algo}`).innerHTML = data.resultat || data.erreur;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function vernamChiffrer() {
+    const message = document.getElementById('vernam-msg').value;
+    const cle = document.getElementById('vernam-key').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'vernam', operation: 'chiffrer', message, params: { cle } })
+        });
+        const data = await response.json();
+        document.getElementById('result-vernam').innerHTML = data.resultat;
+        document.getElementById('vernam-key-hex').innerHTML = data.cle_hex;
+    } catch (error) { console.error(error); }
+}
+
+async function vernamDechiffrer() {
+    const chiffre = document.getElementById('vernam-cipher').value;
+    const cle = document.getElementById('vernam-dec-key').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'vernam', operation: 'dechiffrer', message: chiffre, params: { cle_hex: cle } })
+        });
+        const data = await response.json();
+        document.getElementById('result-vernam-dec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function cbcChiffrer() {
+    const message = document.getElementById('cbc-msg').value;
+    const cle = document.getElementById('cbc-key').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'cbc', operation: 'chiffrer', message, params: { cle } })
+        });
+        const data = await response.json();
+        document.getElementById('result-cbc').innerHTML = data.resultat;
+        document.getElementById('cbc-iv').innerHTML = data.iv;
+    } catch (error) { console.error(error); }
+}
+
+async function cbcDechiffrer() {
+    const chiffre = document.getElementById('cbc-dec-msg').value;
+    const cle = document.getElementById('cbc-key').value;
+    const iv = document.getElementById('cbc-dec-iv').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'cbc', operation: 'dechiffrer', message: chiffre, params: { cle, iv } })
+        });
+        const data = await response.json();
+        document.getElementById('result-cbc-dec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function cfbChiffrer() {
+    const message = document.getElementById('cfb-msg').value;
+    const cle = document.getElementById('cfb-key').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'cfb', operation: 'chiffrer', message, params: { cle } })
+        });
+        const data = await response.json();
+        document.getElementById('result-cfb').innerHTML = data.resultat;
+        document.getElementById('cfb-iv').innerHTML = data.iv;
+    } catch (error) { console.error(error); }
+}
+
+async function cfbDechiffrer() {
+    const chiffre = document.getElementById('cfb-dec-msg').value;
+    const cle = document.getElementById('cfb-key').value;
+    const iv = document.getElementById('cfb-dec-iv').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'cfb', operation: 'dechiffrer', message: chiffre, params: { cle, iv } })
+        });
+        const data = await response.json();
+        document.getElementById('result-cfb-dec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function genererClesRSA() {
+    try {
+        const response = await fetch('/api/generer-cles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'rsa' })
+        });
+        const data = await response.json();
+        rsaKeys = data;
+        document.getElementById('rsa-e').innerText = data.e;
+        document.getElementById('rsa-n').innerText = data.n;
+        document.getElementById('rsa-d').innerText = data.d;
+        document.getElementById('rsa-e-input').value = data.e;
+        document.getElementById('rsa-n-input').value = data.n;
+        document.getElementById('rsa-d-input').value = data.d;
+        document.getElementById('rsa-n-dec-input').value = data.n;
+        document.getElementById('rsa-keys').style.display = 'block';
+    } catch (error) { console.error(error); }
+}
+
+async function rsaChiffrer() {
+    const message = document.getElementById('rsa-msg').value;
+    const e = document.getElementById('rsa-e-input').value;
+    const n = document.getElementById('rsa-n-input').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'rsa', operation: 'chiffrer', message, params: { e, n } })
+        });
+        const data = await response.json();
+        document.getElementById('result-rsa').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function rsaDechiffrer() {
+    const chiffre = document.getElementById('result-rsa').innerHTML;
+    const d = document.getElementById('rsa-d-input').value;
+    const n = document.getElementById('rsa-n-dec-input').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'rsa', operation: 'dechiffrer', message: chiffre, params: { d, n } })
+        });
+        const data = await response.json();
+        document.getElementById('result-rsa-dec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function genererClesElGamal() {
+    try {
+        const response = await fetch('/api/generer-cles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'elgamal' })
+        });
+        const data = await response.json();
+        elgKeys = data;
+        document.getElementById('elg-p').innerText = data.p;
+        document.getElementById('elg-g').innerText = data.g;
+        document.getElementById('elg-y').innerText = data.y;
+        document.getElementById('elg-x').innerText = data.x;
+        document.getElementById('elg-p-input').value = data.p;
+        document.getElementById('elg-g-input').value = data.g;
+        document.getElementById('elg-y-input').value = data.y;
+        document.getElementById('elg-x-input').value = data.x;
+        document.getElementById('elg-p-dec-input').value = data.p;
+        document.getElementById('elgamal-keys').style.display = 'block';
+    } catch (error) { console.error(error); }
+}
+
+async function elgamalChiffrer() {
+    const message = document.getElementById('elg-msg').value;
+    const p = document.getElementById('elg-p-input').value;
+    const g = document.getElementById('elg-g-input').value;
+    const y = document.getElementById('elg-y-input').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'elgamal', operation: 'chiffrer', message, params: { p, g, y } })
+        });
+        const data = await response.json();
+        document.getElementById('result-elg').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function elgamalDechiffrer() {
+    const chiffre = document.getElementById('result-elg').innerHTML;
+    const x = document.getElementById('elg-x-input').value;
+    const p = document.getElementById('elg-p-dec-input').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'elgamal', operation: 'dechiffrer', message: chiffre, params: { x, p } })
+        });
+        const data = await response.json();
+        document.getElementById('result-elg-dec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function genererClesECElGamal() {
+    try {
+        const response = await fetch('/api/generer-cles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'ec_elgamal' })
+        });
+        const data = await response.json();
+        ecKeys = data;
+        document.getElementById('ec-qx').innerText = data.Qx;
+        document.getElementById('ec-qy').innerText = data.Qy;
+        document.getElementById('ec-k').innerText = data.k_prive;
+        document.getElementById('ec-qx-input').value = data.Qx;
+        document.getElementById('ec-qy-input').value = data.Qy;
+        document.getElementById('ec-k-input').value = data.k_prive;
+        document.getElementById('ec-keys').style.display = 'block';
+    } catch (error) { console.error(error); }
+}
+
+async function ecElgamalChiffrer() {
+    const message = document.getElementById('ec-msg').value;
+    const Qx = document.getElementById('ec-qx-input').value;
+    const Qy = document.getElementById('ec-qy-input').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'ec_elgamal', operation: 'chiffrer', message, params: { Qx, Qy } })
+        });
+        const data = await response.json();
+        document.getElementById('result-ec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+async function ecElgamalDechiffrer() {
+    const chiffre = document.getElementById('result-ec').innerHTML;
+    const k = document.getElementById('ec-k-input').value;
+    try {
+        const response = await fetch('/api/crypto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ algorithme: 'ec_elgamal', operation: 'dechiffrer', message: chiffre, params: { k_prive: k } })
+        });
+        const data = await response.json();
+        document.getElementById('result-ec-dec').innerHTML = data.resultat;
+    } catch (error) { console.error(error); }
+}
+
+showPage('cesar');
+</script>
+</body>
+</html>
